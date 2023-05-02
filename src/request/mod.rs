@@ -1,8 +1,4 @@
-use std::fmt::format;
-
-use reqwest::header::HeaderMap;
-
-use crate::models::artist::{self, Artist};
+use crate::models::artist::Artist;
 use crate::user::*;
 
 pub async fn get_secret() -> Result<AccessToken, reqwest::Error> {
@@ -28,7 +24,6 @@ pub async fn get_artist_info(
 ) -> Result<Artist, reqwest::Error> {
     let client = reqwest::Client::new();
     let query: String = format!("https://api.spotify.com/v1/artists/{artist_id}").to_string();
-    println!("The access token is the following: {:#?}", access);
 
     let response = client
         .get(query)
@@ -37,14 +32,28 @@ pub async fn get_artist_info(
         .await?
         .json::<serde_json::Value>()
         .await?;
+
+    let genres: Vec<String> = response["genres"]
+        .as_array()
+        .unwrap()
+        .into_iter()
+        .map(|f| f.to_string())
+        .collect();
+
     let artist = Artist::new(
         response["id"].as_str().unwrap(),
         response["name"].as_str().unwrap(),
+        genres,
         response["uri"].as_str().unwrap(),
-        response["followers"].as_i64().unwrap_or(0) as i32,
+        response["followers"]["total"].as_i64().unwrap_or(0) as i32,
         response["external_urls"]["spotify"].as_str().unwrap(),
         response["popularity"].as_i64().unwrap_or(0) as i32,
     );
 
     Ok(artist)
+}
+
+
+pub fn get_genres() {
+    todo!()
 }
