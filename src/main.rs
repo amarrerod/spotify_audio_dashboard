@@ -1,14 +1,22 @@
-use dotenv::dotenv;
-mod models;
+use rspotify::model::TimeRange;
+
 mod request;
 mod user;
 #[tokio::main]
 async fn main() {
-    dotenv().ok();
+    env_logger::init();
 
-    let token: user::AccessToken = request::get_secret().await.unwrap();
-    let info = request::get_artist_info("36QJpDe2go2KgaRleHCDTp?si=SNOllQDrRXmUrP5OSNG0zw", &token)
+    let spotify = user::authorise_user().await.unwrap();
+
+    let top_artists = request::get_current_top_artist(&spotify, TimeRange::LongTerm)
         .await
         .unwrap();
-    println!("The information is the following: {:#?}", info);
+
+    println!("Top artists are: {:#?}", top_artists);
+
+    let top_songs = request::get_current_top_tracks(&spotify, TimeRange::ShortTerm)
+        .await
+        .unwrap();
+
+    println!("Top songs are: {:#?}", top_songs);
 }

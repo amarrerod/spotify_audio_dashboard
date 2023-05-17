@@ -1,59 +1,32 @@
-use crate::models::artist::Artist;
-use crate::user::*;
+use futures_util::StreamExt;
 
-pub async fn get_secret() -> Result<AccessToken, reqwest::Error> {
-    let client = reqwest::Client::new();
-    let spotify_client_token =
-        std::env::var("SPOTIFY_CLIENT_ID").expect("SPOTIFY_CLIENT_ID must be set in .env");
-    let spotify_client_secret =
-        std::env::var("SPOTIFY_CLIENT_SECRET").expect("SPOTIFY_CLIENT_SECRET must be set in .env");
-    let body : String = format!("grant_type=client_credentials&client_id={spotify_client_token}&client_secret={spotify_client_secret}").to_string();
-    let response: reqwest::Response = client
-        .post("https://accounts.spotify.com/api/token")
-        .header("Content-Type", "application/x-www-form-urlencoded")
-        .body(body)
-        .send()
-        .await?;
-    let info: AccessToken = response.json().await?;
-    Ok(info)
+use rspotify::{
+    model::{FullArtist, FullTrack, TimeRange},
+    prelude::*,
+    AuthCodeSpotify, ClientError,
+};
+
+pub async fn get_current_top_artist(
+    spotify: &AuthCodeSpotify,
+    period: rspotify::model::TimeRange,
+) -> Result<Vec<FullArtist>, ClientError> {
+    let artist_top = spotify
+        .current_user_top_artists(Some(period))
+        .map(|s| s.unwrap())
+        .collect::<Vec<FullArtist>>()
+        .await;
+
+    Ok(artist_top)
 }
 
-pub async fn get_artist_info(
-    artist_id: &str,
-    access: &AccessToken,
-) -> Result<Artist, reqwest::Error> {
-    let client = reqwest::Client::new();
-    let query: String = format!("https://api.spotify.com/v1/artists/{artist_id}").to_string();
-
-    let response = client
-        .get(query)
-        .bearer_auth(&access.access_token)
-        .send()
-        .await?
-        .json::<serde_json::Value>()
-        .await?;
-
-    let genres: Vec<String> = response["genres"]
-        .as_array()
-        .unwrap()
-        .into_iter()
-        .map(|f| f.to_string())
-        .collect();
-
-    let artist = Artist::new(
-        response["id"].as_str().unwrap(),
-        response["name"].as_str().unwrap(),
-        genres,
-        response["uri"].as_str().unwrap(),
-        response["followers"]["total"].as_i64().unwrap_or(0) as i32,
-        response["external_urls"]["spotify"].as_str().unwrap(),
-        response["popularity"].as_i64().unwrap_or(0) as i32,
-    );
-
-    Ok(artist)
-}
-
-
-pub fn get_genres() {
-    todo!()
+pub async fn get_current_top_tracks(
+    spotify: &AuthCodeSpotify,
+    period: TimeRange,
+) -> Result<Vec<FullTrack>, ClientError> {
+    let top_songs = spotify
+        .current_user_top_tracks(Some(period))
+        .map(|s| s.unwrap())
+        .collect::<Vec<FullTrack>>()
+        .await;
+    Ok(top_songs)
 }
