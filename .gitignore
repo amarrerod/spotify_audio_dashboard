@@ -1,3 +1,4 @@
 /target
 .env
 Cargo.lock
+.spotify_token_cache.json
