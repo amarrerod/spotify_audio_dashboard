@@ -1,4 +1,10 @@
-use std::println;
+extern crate num;
+#[macro_use]
+extern crate num_derive;
+use std::{
+    collections::{HashMap, HashSet},
+    println,
+};
 
 use rspotify::model::{TimeRange, TrackId};
 
@@ -24,6 +30,7 @@ async fn main() {
         .iter()
         .map(|t| t.id.as_ref().unwrap().clone())
         .collect();
+
     println!("Ids of songs are: {:?}", ids);
     println!("Top songs are: {:?}", top_songs);
 
@@ -31,4 +38,14 @@ async fn main() {
         .await
         .unwrap();
     println!("Music information: {:#?}", music_info);
+
+    let mut occurrences: HashMap<analytics::Pitches, u32> = HashMap::new();
+    music_info.iter().for_each(|f| {
+        let count = occurrences
+            .entry(num::FromPrimitive::from_i32(f.key).unwrap_or(analytics::Pitches::NotFound))
+            .or_insert(0);
+        *count += 1;
+    });
+
+    println!("The keys are: {:#?}", occurrences);
 }
