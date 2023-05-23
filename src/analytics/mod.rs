@@ -1,9 +1,11 @@
+use polars::prelude::*;
 use rspotify::{
-    model::{AudioAnalysis, TrackId},
     model::{AudioFeatures, FullTrack},
+    model::{Modality, TrackId},
     prelude::BaseClient,
     AuthCodeSpotify, ClientError,
 };
+use std::io::Cursor;
 
 #[derive(FromPrimitive, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Pitches {
@@ -22,11 +24,26 @@ pub enum Pitches {
     B = 11,
 }
 
-// #[derive(Debug, Clone)]
-// pub struct TrackMusicInfo {
-//     pub features: Vec<AudioFeatures>,
-//     pub analysis: AudioAnalysis,
-// }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Key {
+    pub mode: String,
+    pub pitch: Pitches,
+}
+
+pub fn mode_to_string(m: Modality) -> Option<String> {
+    match m {
+        Modality::Major => Some(String::from("Major")),
+        Modality::Minor => Some(String::from("Minor")),
+        _ => Some(String::from("Not Found")),
+    }
+}
+
+pub fn to_dataframe(tracks: &[AudioFeatures]) -> Result<DataFrame, PolarsError> {
+    let json = serde_json::to_string(&tracks).unwrap();
+    let cursor = Cursor::new(json);
+    let df = JsonReader::new(cursor).finish()?;
+    Ok(df)
+}
 
 pub async fn analyse_tracks(
     tracks: &[FullTrack],
@@ -37,21 +54,5 @@ pub async fn analyse_tracks(
         .map(|t| t.id.as_ref().unwrap().clone())
         .collect();
     let track_features = spotify.tracks_features(ids.clone()).await.unwrap().unwrap();
-
-    // let track_analysis: Vec<AudioAnalysis> =
-    //     futures::future::join_all(ids.iter().map(|id| spotify.track_analysis(id.clone())))
-    //         .await
-    //         .into_iter()
-    //         .collect::<Result<_, _>>()
-    //         .unwrap();
-
-    // let all_data: Vec<TrackMusicInfo> = track_features
-    //     .iter()
-    //     .zip(track_analysis)
-    //     .map(|(f, a)| TrackMusicInfo {
-    //         features: f.clone(),
-    //         analysis: a.clone(),
-    //     })
-    //     .collect::<Vec<_>>();
     Ok(track_features)
 }
