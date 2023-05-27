@@ -9,18 +9,6 @@ use rspotify::{
 
 use crate::types::{mode_to_string, Key, Pitches};
 
-pub async fn analyse_tracks(
-    tracks: &[FullTrack],
-    spotify: &AuthCodeSpotify,
-) -> Result<Vec<AudioFeatures>, ClientError> {
-    let ids: Vec<TrackId> = tracks
-        .iter()
-        .map(|t| t.id.as_ref().unwrap().clone())
-        .collect();
-    let track_features = spotify.tracks_features(ids.clone()).await.unwrap().unwrap();
-    Ok(track_features)
-}
-
 pub fn key_occurences(music_info: &[AudioFeatures]) -> HashMap<Key, u32> {
     let mut occurrences: HashMap<Key, u32> = HashMap::new();
     music_info.iter().for_each(|f| {

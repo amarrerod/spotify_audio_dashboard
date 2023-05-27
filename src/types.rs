@@ -1,5 +1,5 @@
-use rspotify::model::Modality;
-
+use rspotify::model::{AudioFeatures, FullTrack, Modality};
+use std::fmt;
 #[derive(FromPrimitive, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Pitches {
     NotFound = -1,
@@ -17,6 +17,26 @@ pub enum Pitches {
     B = 11,
 }
 
+impl fmt::Display for Pitches {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Pitches::C => write!(f, "C"),
+            Pitches::Db => write!(f, "C#"),
+            Pitches::D => write!(f, "D"),
+            Pitches::Eb => write!(f, "Eb"),
+            Pitches::E => write!(f, "E"),
+            Pitches::F => write!(f, "F"),
+            Pitches::Gb => write!(f, "F#"),
+            Pitches::G => write!(f, "G"),
+            Pitches::Ab => write!(f, "G#"),
+            Pitches::A => write!(f, "A"),
+            Pitches::Bb => write!(f, "Bb"),
+            Pitches::B => write!(f, "B"),
+            Pitches::NotFound => write!(f, "Not Found"),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Key {
     pub mode: String,
@@ -29,4 +49,9 @@ pub fn mode_to_string(m: Modality) -> Option<String> {
         Modality::Minor => Some(String::from("m")),
         _ => Some(String::from("Not Found")),
     }
+}
+
+pub struct GeekTrack {
+    pub track: FullTrack,
+    pub features: AudioFeatures,
 }

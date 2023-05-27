@@ -6,10 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-dotenv = "0.15.0"
-reqwest = {version = "0.11.17", features = ["blocking", "json"]}
-serde = { version = "1.0.160", features = ["derive"]}
-serde_json = "1.0.96"
 tokio = {version = "1.28.0", features = ["macros", "rt-multi-thread"] }
 rspotify = { version = "0.11.7",default-features = false, features = ["client-reqwest", "reqwest-native-tls", "env-file", "cli"] }
 log = "0.4.17"
@@ -18,5 +14,7 @@ futures-util = "0.3.28"
 num = "0.4"
 num-derive = "0.3"
 num-traits = "0.2"
-env_logger = "0.10.0"
 clap = { version = "4.3.0", features = ["derive"] }
+env_logger = "0.10.0"
+tabled = "0.12.0"
+enum_str = "0.1.2"
