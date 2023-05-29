@@ -1,4 +1,6 @@
-# Spotify Audio Trends
+# Spotify Audio Trends 
+
+[![Rust](https://github.com/amarrerod/spotify_audio_dashboard/actions/workflows/rust.yml/badge.svg?branch=master)](https://github.com/amarrerod/spotify_audio_dashboard/actions/workflows/rust.yml)
 
 Get the audio information from your top tracks and artists.
 
