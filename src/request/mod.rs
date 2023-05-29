@@ -1,6 +1,5 @@
 use std::{collections::hash_map::Entry, collections::HashMap};
 
-use futures::{executor::Enter, future};
 use futures_util::StreamExt;
 use rspotify::{
     model::{AudioFeatures, FullArtist, FullTrack, TimeRange, TrackId},
@@ -50,12 +49,12 @@ pub async fn get_current_top_tracks(
     ids.iter().for_each(|id| {
         let ft = match tracks.entry(id.clone()) {
             Entry::Occupied(o) => o.get().clone(),
-            Entry::Vacant(v) => panic!("Full track info not found"),
+            Entry::Vacant(_) => panic!("Full track info not found"),
         };
 
         let af = match features.entry(id.clone()) {
             Entry::Occupied(o) => o.get().clone(),
-            Entry::Vacant(v) => panic!("Audio features not found"),
+            Entry::Vacant(_) => panic!("Audio features not found"),
         };
 
         top_geek.entry(id.clone()).or_insert(GeekTrack {
@@ -65,20 +64,4 @@ pub async fn get_current_top_tracks(
     });
 
     Ok(top_geek)
-}
-
-pub async fn get_track_features(
-    id: TrackId<'_>,
-    spotify: &AuthCodeSpotify,
-) -> Result<AudioFeatures, ClientError> {
-    let result = spotify.track_features(id).await.unwrap();
-    Ok(result)
-}
-
-pub async fn get_tracks_features(
-    ids: Vec<TrackId<'_>>,
-    spotify: &AuthCodeSpotify,
-) -> Result<Vec<AudioFeatures>, ClientError> {
-    let track_features = spotify.tracks_features(ids.clone()).await.unwrap().unwrap();
-    Ok(track_features)
 }

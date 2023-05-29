@@ -1,7 +1,5 @@
-use clap::builder::ValueParser;
 use clap::Parser;
 use rspotify::model::TimeRange;
-use std::str::FromStr;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Scope {

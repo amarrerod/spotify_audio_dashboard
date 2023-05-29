@@ -10,7 +10,7 @@ mod types;
 mod user;
 
 use clap::Parser;
-use rspotify::model::FullArtist;
+use rspotify::model::{AudioFeatures, FullArtist};
 
 #[tokio::main]
 async fn main() {
@@ -31,6 +31,14 @@ async fn main() {
                 .unwrap();
 
             display::display_top_tracks_as_table(&data);
+
+            if let Some(_) = args.key_summary {
+                let features: Vec<AudioFeatures> =
+                    data.iter().map(|(_, g)| g.features.clone()).collect();
+                let top_keys = analytics::key_occurences(&features);
+                println!("These are the top keys");
+                display::display_top_keys(&top_keys);
+            }
         }
         _ => (),
     };

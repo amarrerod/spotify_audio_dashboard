@@ -51,6 +51,12 @@ pub fn mode_to_string(m: Modality) -> Option<String> {
     }
 }
 
+impl fmt::Display for Key {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}{}", self.pitch, self.mode)
+    }
+}
+
 pub struct GeekTrack {
     pub track: FullTrack,
     pub features: AudioFeatures,

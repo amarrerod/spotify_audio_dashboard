@@ -1,11 +1,6 @@
 use std::collections::HashMap;
 
-use rspotify::{
-    model::{AudioFeatures, FullTrack},
-    model::{Modality, TrackId},
-    prelude::BaseClient,
-    AuthCodeSpotify, ClientError,
-};
+use rspotify::model::AudioFeatures;
 
 use crate::types::{mode_to_string, Key, Pitches};
 
