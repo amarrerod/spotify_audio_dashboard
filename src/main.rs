@@ -10,6 +10,7 @@ mod types;
 mod user;
 
 use clap::Parser;
+use rspotify::model::FullArtist;
 
 #[tokio::main]
 async fn main() {
@@ -19,13 +20,10 @@ async fn main() {
 
     match args.scope {
         cli::Scope::TopArtists => {
-            let data: Vec<String> = request::get_current_top_artist(&spotify, args.period)
+            let data: Vec<FullArtist> = request::get_current_top_artist(&spotify, args.period)
                 .await
-                .unwrap()
-                .iter()
-                .map(|a| a.name.clone())
-                .collect();
-            println!("{:#?}", data);
+                .unwrap();
+            display::display_top_artists_as_table(&data);
         }
         cli::Scope::TopTracks => {
             let data = request::get_current_top_tracks(&spotify, args.period)
